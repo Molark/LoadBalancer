@@ -1,0 +1,48 @@
+services:
+  pg:
+    image: postgres:18.3-alpine3.23
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-booking}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d booking" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  app:
+    build: .
+    expose:
+      - "8080"
+    environment:
+      DB_HOST: ${DB_HOST:-pg}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_NAME: ${DB_NAME:-booking}
+      JWT_SECRET: ${JWT_SECRET:-aa8c24f218eaefd0c19db33eb89e9fc122bd5f6e0207360495cbe7970c2871e3}
+    depends_on:
+      pg:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
