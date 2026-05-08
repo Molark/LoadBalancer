@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Room Booking Service (Test Task)
+  title: Room Booking Service
   description: Сервис бронирования переговорок
   version: "1.0.0"
 
@@ -193,10 +193,6 @@ components:
         status:
           type: string
           enum: [active, cancelled]
-        conferenceLink:
-          type: string
-          format: uri
-          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -575,9 +571,6 @@ paths:
                 slotId:
                   type: string
                   format: uuid
-                createConferenceLink:
-                  type: boolean
-                  default: false
       responses:
         '201':
           description: Бронь создана

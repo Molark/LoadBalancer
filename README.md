@@ -18,3 +18,8 @@ curl http://localhost/_info
 This endpoint checks availability of service and prints message, in logs you will see that you get responses from different pods.
 You should see something similar to this
 ![img.png](img.png)
+To test the logic of application run
+```
+go test ./internal/service -v    
+```
+It will run integration and unit tests

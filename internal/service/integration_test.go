@@ -68,7 +68,7 @@ func TestIntegration(t *testing.T) {
 
 	scheduleInput := models.Schedule{
 		RoomId:     createdRoom.Id,
-		DaysOfWeek: []int{1, 2, 3, 4, 5},
+		DaysOfWeek: []int{1, 2, 3, 4, 5, 6, 7},
 		StartTime:  "09:00",
 		EndTime:    "18:00",
 	}
