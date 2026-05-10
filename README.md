@@ -23,3 +23,6 @@ To test the logic of application run
 go test ./internal/service -v    
 ```
 It will run integration and unit tests
+
+## CI pipeline:
+in repo ci pipeline automaticaly runs on create pull request with main branch
