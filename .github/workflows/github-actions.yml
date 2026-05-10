@@ -14,5 +14,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Run tests
-        run: go test ./...
+      - name: Run unit tests
+        run: |
+          pkgs=$(go list ./... | grep -v '/internal/service$' || true)
+          if [ -n "$pkgs" ]; then
+            go test -v -count=1 $pkgs
+          fi
+          go test -v -count=1 ./internal/service -run '^TestService_'
+      - name: Run integration tests
+        run: go test -v -count=1 ./internal/service -run '^TestIntegration$'
+
