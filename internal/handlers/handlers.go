@@ -56,13 +56,6 @@ func (h Handler) CreateSchedule(w http.ResponseWriter, r *http.Request) {
 		slog.Error("Error in parsing CreateSchedule", slog.Any("err", err))
 		return
 	}
-	schedule.RoomId, err = uuid.Parse(r.PathValue("roomId"))
-	if err != nil {
-		RespondError(w, ErrInvalidRequest)
-		slog.Error("Error in parsing CreateSchedule", slog.Any("err", err))
-		return
-	}
-
 	schedule, err = h.service.CreateSchedule(r.Context(), schedule)
 	if err != nil {
 		slog.Error("Error in request to service CreateSchedule")

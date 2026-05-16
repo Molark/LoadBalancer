@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Room Booking Service
-  description: Сервис бронирования переговорок
+  description: Room Booking Service
   version: "1.0.0"
 
 servers:
@@ -29,7 +29,7 @@ components:
       schema:
         type: string
         format: uuid
-      description: Идентификатор переговорки
+      description: Room identifier
     BookingIdPath:
       name: bookingId
       in: path
@@ -37,7 +37,7 @@ components:
       schema:
         type: string
         format: uuid
-      description: Идентификатор брони
+      description: Booking identifier
 
   schemas:
     ErrorResponse:
@@ -92,7 +92,7 @@ components:
       properties:
         token:
           type: string
-          description: JWT для заголовка Authorization Bearer
+          description: JWT for the Authorization Bearer header
 
     User:
       type: object
@@ -148,15 +148,15 @@ components:
             type: integer
             minimum: 1
             maximum: 7
-          description: "1=Пн .. 7=Вс, дни доступности. Каждое значение должно быть в диапазоне 1–7."
+          description: "1=Mon .. 7=Sun, days of availability. Each value must be in the range 1–7."
         startTime:
           type: string
           pattern: "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-          description: Время начала (HH:MM) в рамках дня. Интерпретируется как UTC.
+          description: Start time (HH:MM) within the day. Interpreted as UTC.
         endTime:
           type: string
           pattern: "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-          description: Время окончания (HH:MM) в рамках дня. Интерпретируется как UTC.
+          description: End time (HH:MM) within the day. Interpreted as UTC.
 
     Slot:
       type: object
@@ -171,11 +171,11 @@ components:
         start:
           type: string
           format: date-time
-          description: Время начала слота в UTC (ISO 8601, например 2024-06-10T09:00:00Z)
+          description: Slot start time in UTC (ISO 8601, e.g. 2024-06-10T09:00:00Z)
         end:
           type: string
           format: date-time
-          description: Время окончания слота в UTC (ISO 8601, например 2024-06-10T09:30:00Z)
+          description: Slot end time in UTC (ISO 8601, e.g. 2024-06-10T09:30:00Z)
 
     Booking:
       type: object
@@ -204,13 +204,13 @@ components:
       properties:
         page:
           type: integer
-          description: Текущая страница (начиная с 1)
+          description: Current page (starting from 1)
         pageSize:
           type: integer
-          description: Размер страницы
+          description: Page size
         total:
           type: integer
-          description: Общее количество записей
+          description: Total number of records
 
 paths:
   # ──────────────────────────────────────────────────────────────
@@ -220,10 +220,10 @@ paths:
   /register:
     post:
       tags: [Auth]
-      summary: "Регистрация пользователя"
+      summary: "User registration"
       description: >
-        Создаёт нового пользователя и возвращает его данные.
-        Доступен без авторизации.
+        Creates a new user and returns their data.
+        Available without authorization.
       requestBody:
         required: true
         content:
@@ -242,7 +242,7 @@ paths:
                   enum: [admin, user]
       responses:
         '201':
-          description: Пользователь создан
+          description: User created
           content:
             application/json:
               schema:
@@ -251,12 +251,12 @@ paths:
                   user:
                     $ref: '#/components/schemas/User'
         '400':
-          description: Неверный запрос или email уже занят
+          description: Invalid request or email already taken
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -264,11 +264,11 @@ paths:
   /login:
     post:
       tags: [Auth]
-      summary: "Авторизация по email и паролю"
+      summary: "Login with email and password"
       description: >
-        Авторизует пользователя по email и паролю, возвращает JWT.
+        Authenticates a user by email and password and returns a JWT.
         
-        Доступен без авторизации.
+        Available without authorization.
       requestBody:
         required: true
         content:
@@ -284,18 +284,18 @@ paths:
                   type: string
       responses:
         '200':
-          description: Успешная авторизация
+          description: Successful authorization
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
         '401':
-          description: Неверные учётные данные
+          description: Invalid credentials
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -303,14 +303,14 @@ paths:
   /dummyLogin:
     post:
       tags: [Auth]
-      summary: Получить тестовый JWT по роли . Доступен без авторизации.
+      summary: Get a test JWT by role. Available without authorization.
       description: >
-        Выдаёт тестовый JWT для указанной роли (admin / user).
-        Для каждой роли возвращается **фиксированный UUID** пользователя:
-        один и тот же UUID для всех запросов с ролью admin и один и тот же UUID для роли user.
-        Это обеспечивает стабильность при тестировании сценариев, требующих проверки владельца брони.
-        JWT должен содержать как минимум `user_id` (UUID) и `role`.
-        Принимает только допустимые значения роли: `admin` или `user`; иные значения — 400.
+        Issues a test JWT for the specified role (admin / user).
+        For each role, a **fixed UUID** of the user is returned:
+        the same UUID for all requests with the admin role and the same UUID for the user role.
+        This ensures stability when testing scenarios that require owner verification.
+        The JWT contain `user_id` (UUID) and `role`.
+        Accepts only valid role values: `admin` or `user`; other values result in 400.
       requestBody:
         required: true
         content:
@@ -324,18 +324,18 @@ paths:
                   enum: [admin, user]
       responses:
         '200':
-          description: Тестовый токен
+          description: Test token
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
         '400':
-          description: Неверный запрос (недопустимое значение роли)
+          description: Invalid request (invalid role value)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -347,11 +347,11 @@ paths:
   /rooms/list:
     get:
       tags: [Rooms]
-      summary: Список переговорок (admin и user)
+      summary: List of rooms (admin and user)
       security: [{ BearerAuth: [] }]
       responses:
         '200':
-          description: Список переговорок
+          description: List of rooms
           content:
             application/json:
               schema:
@@ -362,12 +362,12 @@ paths:
                     items:
                       $ref: '#/components/schemas/Room'
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -375,7 +375,7 @@ paths:
   /rooms/create:
     post:
       tags: [Rooms]
-      summary: Создать переговорку (только admin)
+      summary: Create a room (admin only)
       security: [{ BearerAuth: [] }]
       requestBody:
         required: true
@@ -395,7 +395,7 @@ paths:
                   nullable: true
       responses:
         '201':
-          description: Переговорка создана
+          description: Room created
           content:
             application/json:
               schema:
@@ -404,22 +404,22 @@ paths:
                   room:
                     $ref: '#/components/schemas/Room'
         '400':
-          description: Неверный запрос
+          description: Invalid request
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '403':
-          description: Доступ запрещён (требуется роль admin)
+          description: Access forbidden (admin role required)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -428,15 +428,15 @@ paths:
   # Schedules
   # ──────────────────────────────────────────────────────────────
 
-  /rooms/{roomId}/schedule/create:
+  /rooms/schedule/create:
     post:
       tags: [Schedules]
-      summary: Создать расписание переговорки (только admin, только один раз). Длительность слота 30 мин. После создания расписание изменить нельзя.
+      summary: Create room schedule (admin only, once only). Slot duration is 30 minutes. Schedule cannot be changed after creation.
       description: >
-        Доступно только роли admin.
-        Расписание можно создать только один раз для каждой переговорки.
-        Поле `daysOfWeek` должно содержать значения от 1 до 7 (1=Пн, 7=Вс).
-        При передаче значений вне этого диапазона возвращается 400.
+        Available only for the admin role.
+        A schedule can be created only once for each room.
+        The `daysOfWeek` field must contain values from 1 to 7 (1=Mon, 7=Sun).
+        Values outside this range return 400.
       security: [{ BearerAuth: [] }]
       parameters:
         - $ref: '#/components/parameters/RoomIdPath'
@@ -448,7 +448,7 @@ paths:
               $ref: '#/components/schemas/Schedule'
       responses:
         '201':
-          description: Расписание сохранено
+          description: Schedule saved
           content:
             application/json:
               schema:
@@ -457,27 +457,27 @@ paths:
                   schedule:
                     $ref: '#/components/schemas/Schedule'
         '400':
-          description: Неверный запрос (в т.ч. недопустимые значения daysOfWeek)
+          description: Invalid request (including invalid daysOfWeek values)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '403':
-          description: Доступ запрещён (требуется роль admin)
+          description: Access forbidden (admin role required)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '404':
-          description: Переговорка не найдена
+          description: Room not found
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '409':
-          description: Расписание для переговорки уже создано, изменение не допускается
+          description: Schedule for this room already exists and cannot be changed
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -486,7 +486,7 @@ paths:
                   code: SCHEDULE_EXISTS
                   message: schedule for this room already exists and cannot be changed
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -498,25 +498,25 @@ paths:
   /rooms/{roomId}/slots/list:
     get:
       tags: [Slots]
-      summary: Список доступных для бронирования слотов по переговорке и дате (admin и user). Наиболее нагруженный эндпоинт.
+      summary: List of available slots for a room on a specific date (admin and user). The most loaded endpoint.
       description: >
-        Возвращает слоты, не занятые активной бронью, для указанной переговорки на указанную дату.
-        Все даты и время передаются и возвращаются в UTC.
-        Параметр `date` является обязательным; при его отсутствии возвращается 400.
-        Если у переговорки нет расписания — возвращается пустой список (переговорка считается всегда недоступной).
+        Returns slots that are not occupied by an active booking for the specified room on the specified date.
+        All dates and times are provided and returned in UTC.
+        The `date` parameter is required; if missing, returns 400.
+        If the room has no schedule — returns an empty list (room is considered always unavailable).
       security: [{ BearerAuth: [] }]
       parameters:
         - $ref: '#/components/parameters/RoomIdPath'
         - name: date
           in: query
           required: true
-          description: "Дата в формате ISO 8601 (например: 2024-06-10). Обязательный параметр; при отсутствии — 400."
+          description: "Date in ISO 8601 format (e.g.: 2024-06-10). Required parameter; absence results in 400."
           schema:
             type: string
             format: date
       responses:
         '200':
-          description: Список доступных слотов (не занятых активной бронью). Пустой список, если у переговорки нет расписания или на эту дату нет слотов.
+          description: List of available slots (not occupied by active bookings). Empty list if the room has no schedule or no slots on this date.
           content:
             application/json:
               schema:
@@ -527,22 +527,22 @@ paths:
                     items:
                       $ref: '#/components/schemas/Slot'
         '400':
-          description: Неверный запрос (отсутствует или некорректен параметр date)
+          description: Invalid request (missing or incorrect date parameter)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '404':
-          description: Переговорка не найдена
+          description: Room not found
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -554,11 +554,10 @@ paths:
   /bookings/create:
     post:
       tags: [Bookings]
-      summary: Создать бронь на слот (только user). Опционально — запросить ссылку на конференцию.
+      summary: Create a booking for a slot (user only)
       description: >
-        Доступно только роли user. Администратор не может создавать брони (403).
-        `userId` берётся из JWT-токена, а не из тела запроса.
-        Если временной слот находится в прошлом (start < now), возвращается 400 (INVALID_REQUEST).
+        Available only for the user role. Administrators cannot create bookings (403).
+        If the time slot is in the past (start < now), returns 400 (INVALID_REQUEST).
       security: [{ BearerAuth: [] }]
       requestBody:
         required: true
@@ -573,7 +572,7 @@ paths:
                   format: uuid
       responses:
         '201':
-          description: Бронь создана
+          description: Booking created
           content:
             application/json:
               schema:
@@ -582,27 +581,27 @@ paths:
                   booking:
                     $ref: '#/components/schemas/Booking'
         '400':
-          description: Неверный запрос
+          description: Invalid request
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '403':
-          description: Доступ запрещён (бронирование доступно только роли user)
+          description: Access forbidden (booking available only for user role)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '404':
-          description: Слот не найден
+          description: Slot not found
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '409':
-          description: Слот уже занят
+          description: Slot is already booked
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -611,7 +610,7 @@ paths:
                   code: SLOT_ALREADY_BOOKED
                   message: slot is already booked
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -619,24 +618,24 @@ paths:
   /bookings/list:
     get:
       tags: [Bookings]
-      summary: Список всех броней с пагинацией (только admin)
+      summary: List of all bookings with pagination (admin only)
       description: >
-        Доступно только роли admin.
-        Поддерживает пагинацию через параметры `page` и `pageSize`.
-        Оба параметра опциональны; значения по умолчанию: `page=1`, `pageSize=20`.
-        Максимальное значение `pageSize` — 100.
+        Available only for the admin role.
+        Supports pagination via `page` and `pageSize` parameters.
+        Both parameters are optional; defaults: `page=1`, `pageSize=20`.
+        Maximum `pageSize` is 100.
       security: [{ BearerAuth: [] }]
       parameters:
         - name: page
           in: query
-          description: Номер страницы (начиная с 1). По умолчанию 1.
+          description: Page number (starting from 1). Default is 1.
           schema:
             type: integer
             minimum: 1
             default: 1
         - name: pageSize
           in: query
-          description: Количество записей на странице. По умолчанию 20, максимум 100.
+          description: Number of records per page. Default 20, maximum 100.
           schema:
             type: integer
             minimum: 1
@@ -644,7 +643,7 @@ paths:
             default: 20
       responses:
         '200':
-          description: Список всех броней
+          description: List of all bookings
           content:
             application/json:
               schema:
@@ -657,22 +656,22 @@ paths:
                   pagination:
                     $ref: '#/components/schemas/Pagination'
         '400':
-          description: Неверный запрос (некорректные параметры пагинации)
+          description: Invalid request (incorrect pagination parameters)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '403':
-          description: Доступ запрещён (только admin)
+          description: Access forbidden (admin only)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -680,15 +679,15 @@ paths:
   /bookings/my:
     get:
       tags: [Bookings]
-      summary: Список броней текущего пользователя (только user)
+      summary: List of current user's bookings (user only)
       description: >
-        Доступно только роли user.
-        Возвращает брони пользователя, чей `user_id` содержится в JWT-токене.
-        Возвращаются только брони на будущие слоты (start >= now); брони на уже прошедшие слоты в ответ не включаются.
+        Available only for the user role.
+        Returns bookings of the user whose `user_id` is in the JWT token.
+        Only bookings for future slots are returned (start >= now); bookings for past slots are not included.
       security: [{ BearerAuth: [] }]
       responses:
         '200':
-          description: Список броней текущего пользователя
+          description: List of current user's bookings
           content:
             application/json:
               schema:
@@ -699,17 +698,17 @@ paths:
                     items:
                       $ref: '#/components/schemas/Booking'
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '403':
-          description: Доступ запрещён (только user)
+          description: Access forbidden (user only)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
@@ -717,19 +716,19 @@ paths:
   /bookings/{bookingId}/cancel:
     post:
       tags: [Bookings]
-      summary: Отменить бронь (только своя бронь, только user)
+      summary: Cancel a booking (only own booking, user only)
       description: >
-        Доступно только роли user. Пользователь может отменить только свою бронь.
-        Операция **идемпотентна**: повторный вызов на уже отменённой брони не является ошибкой
-        и возвращает 200 с актуальным состоянием брони (status: cancelled).
-        При попытке отменить чужую бронь — 403.
-        При отсутствии брони с указанным ID — 404.
+        Available only for the user role. A user can only cancel their own booking.
+        The operation is **idempotent**: calling it again on an already cancelled booking is not an error
+        and returns 200 with the current booking state (status: cancelled).
+        Attempting to cancel someone else's booking returns 403.
+        If no booking with the given ID exists — 404.
       security: [{ BearerAuth: [] }]
       parameters:
         - $ref: '#/components/parameters/BookingIdPath'
       responses:
         '200':
-          description: Бронь отменена (или уже была отменена ранее)
+          description: Booking cancelled (or was already cancelled)
           content:
             application/json:
               schema:
@@ -738,12 +737,12 @@ paths:
                   booking:
                     $ref: '#/components/schemas/Booking'
         '401':
-          description: Не авторизован
+          description: Unauthorized
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '403':
-          description: Не своя бронь или роль не user
+          description: Not own booking or not user role
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -752,12 +751,12 @@ paths:
                   code: FORBIDDEN
                   message: cannot cancel another user's booking
         '404':
-          description: Бронь не найдена
+          description: Booking not found
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '500':
-          description: Внутренняя ошибка сервера
+          description: Internal server error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InternalErrorResponse' }
