@@ -24,7 +24,7 @@ func (h Handler) SetupRoutes(mux *http.ServeMux) {
 
 	mux.Handle("GET /rooms/list", h.JWTAuthMiddleware(http.HandlerFunc(h.GetRooms)))
 	mux.Handle("POST /rooms/create", h.JWTAuthMiddleware(http.HandlerFunc(h.CreateRoom)))
-	mux.Handle("POST /rooms/{roomId}/schedule/create", h.JWTAuthMiddleware(http.HandlerFunc(h.CreateSchedule)))
+	mux.Handle("POST /rooms/schedule/create", h.JWTAuthMiddleware(http.HandlerFunc(h.CreateSchedule)))
 	mux.Handle("GET /rooms/{roomId}/slots/list", h.JWTAuthMiddleware(http.HandlerFunc(h.GetSlots)))
 	mux.Handle("POST /bookings/create", h.JWTAuthMiddleware(http.HandlerFunc(h.CreateBooking)))
 	mux.Handle("GET /bookings/list", h.JWTAuthMiddleware(http.HandlerFunc(h.GetAllBookings)))
